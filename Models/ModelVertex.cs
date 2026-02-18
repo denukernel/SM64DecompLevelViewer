@@ -2,10 +2,16 @@ namespace Sm64DecompLevelViewer.Models;
 
 public class ModelVertex
 {
+    public int X { get; set; }
+    public int Y { get; set; }
     public int Z { get; set; }
 
+    public int S { get; set; }
     public int T { get; set; }
 
+    public byte NX { get; set; }
+    public byte NY { get; set; }
+    public byte NZ { get; set; }
     public byte Alpha { get; set; }
 
     public ModelVertex(int x, int y, int z, int s, int t, byte nx, byte ny, byte nz, byte alpha)

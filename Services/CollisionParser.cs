@@ -63,6 +63,7 @@ public class CollisionParser
         var triInitMatches = TriInitPattern.Matches(content);
         var currentSurfaceType = "SURFACE_DEFAULT";
 
+        var triMatches = TriPattern.Matches(content);
         int triInitIndex = 0;
         int triCount = 0;
         int expectedTriCount = 0;

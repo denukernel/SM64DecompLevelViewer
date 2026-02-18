@@ -91,6 +91,10 @@ public class GeometryRenderer : GameWindow
         GL.ClearColor(0.1f, 0.1f, 0.15f, 1.0f);
         GL.Enable(EnableCap.DepthTest);
 
+        _collisionShaderProgram = CreateCollisionShader();
+        _visualShaderProgram = CreateVisualShader();
+        _objectShaderProgram = CreateObjectShader();
+
         UpdateProjection();
         
         // Ensure window has focus for keyboard/mouse input

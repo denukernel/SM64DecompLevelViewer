@@ -12,7 +12,8 @@ using OpenTK.Windowing.Common;
 
 namespace Sm64DecompLevelViewer;
 
-namespace Sm64DecompLevelViewer;
+public partial class MainWindow : Window
+{
     private List<LevelMetadata> _levels = new();
     private readonly LevelScanner _levelScanner;
     private readonly CollisionParser _collisionParser;
@@ -376,6 +377,8 @@ namespace Sm64DecompLevelViewer;
                         var macroListName = objectParser.ParseMacroListName(scriptPath);
                         if (macroListName != null)
                         {
+                            Dictionary<string, MacroPreset> presets = new();
+                            
                             if (!string.IsNullOrEmpty(_projectRootPath))
                             {
                                 var selectedPresetsPath = Path.Combine(_projectRootPath, "include", "macro_presets.inc.c");
