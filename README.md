@@ -2,7 +2,7 @@
 
 A powerful and modern C#/.NET 8 levels viewer for Super Mario 64 Decompilation projects. This tool allows you to visualize levels, collision data, and object placement (including macro and special objects) directly from your decomp repository.
 
-![Feature Preview](https://via.placeholder.com/800x450.png?text=SM64+Decomp+Level+Viewer+Preview)
+![Feature Preview](https://github.com/user-attachments/assets/b6de54b7-9f83-4f9e-a948-274193dbdd51)
 
 ## Key Features
 
