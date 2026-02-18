@@ -15,17 +15,14 @@ namespace Sm64DecompLevelViewer.Services
 
     public class MacroObjectParser
     {
-        // Regex to parse /* macro_name */ { behavior, model, param }
         private static readonly Regex PresetPattern = new Regex(
             @"\/\*\s*([a-zA-Z0-9_]+)\s*\*\/\s*\{\s*([a-zA-Z0-9_]+),\s*([a-zA-Z0-9_]+),\s*([^}]+)\}",
             RegexOptions.Compiled);
 
-        // Regex to parse MACRO_OBJECT(/*preset*/ macro_name, /*yaw*/ yaw, /*pos*/ x, y, z)
         private static readonly Regex MacroObjectPattern = new Regex(
             @"MACRO_OBJECT\s*\(\s*/\*preset\*/\s*([^,]+),\s*/\*yaw\*/\s*(-?\d+),\s*/\*pos\*/\s*(-?\d+),\s*(-?\d+),\s*(-?\d+)\s*\)",
             RegexOptions.Compiled);
 
-        // Regex to parse MACRO_OBJECT_WITH_BHV_PARAM(/*preset*/ macro_name, /*yaw*/ yaw, /*pos*/ x, y, z, /*bhvParam*/ param)
         private static readonly Regex MacroObjectWithParamPattern = new Regex(
             @"MACRO_OBJECT_WITH_BHV_PARAM\s*\(\s*/\*preset\*/\s*([^,]+),\s*/\*yaw\*/\s*(-?\d+),\s*/\*pos\*/\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*/\*bhvParam\*/\s*([^)]+)\)",
             RegexOptions.Compiled);
@@ -51,12 +48,9 @@ namespace Sm64DecompLevelViewer.Services
                     string model = match.Groups[3].Value.Trim();
                     string paramStr = match.Groups[4].Value.Trim();
 
-                    // Simplify param evaluation (basic ORs and literals)
                     int paramValue = 0;
                     if (paramStr.Contains("|"))
                     {
-                        // Just extract numbers if it's a bitwise OR of constants for now
-                        // Or handle common ones if needed
                     }
                     else if (int.TryParse(paramStr, out int p))
                     {
@@ -89,7 +83,6 @@ namespace Sm64DecompLevelViewer.Services
             {
                 string content = File.ReadAllText(filePath);
                 
-                // Process MACRO_OBJECT entries
                 var macroMatches = MacroObjectPattern.Matches(content);
                 foreach (Match match in macroMatches)
                 {
@@ -103,13 +96,12 @@ namespace Sm64DecompLevelViewer.Services
                             X = int.Parse(match.Groups[3].Value),
                             Y = int.Parse(match.Groups[4].Value),
                             Z = int.Parse(match.Groups[5].Value),
-                            RY = int.Parse(match.Groups[2].Value), // Already in degrees in C source
+                            RY = int.Parse(match.Groups[2].Value),
                             Params = (uint)preset.Param
                         });
                     }
                 }
 
-                // Process MACRO_OBJECT_WITH_BHV_PARAM entries
                 var paramMatches = MacroObjectWithParamPattern.Matches(content);
                 foreach (Match match in paramMatches)
                 {
@@ -128,8 +120,8 @@ namespace Sm64DecompLevelViewer.Services
                             X = int.Parse(match.Groups[3].Value),
                             Y = int.Parse(match.Groups[4].Value),
                             Z = int.Parse(match.Groups[5].Value),
-                            RY = int.Parse(match.Groups[2].Value), // Already in degrees in C source
-                            Params = paramValue | (uint)preset.Param // Combine preset default and instance param
+                            RY = int.Parse(match.Groups[2].Value),
+                            Params = paramValue | (uint)preset.Param
                         });
                     }
                 }
@@ -142,9 +134,6 @@ namespace Sm64DecompLevelViewer.Services
             return objects;
         }
 
-        /// <summary>
-        /// No longer needed as we parse the C source directly which uses degrees.
-        /// </summary>
         [Obsolete("The C source already uses degrees.")]
         public static float ConvertMacroRotation(int rawRotation)
         {

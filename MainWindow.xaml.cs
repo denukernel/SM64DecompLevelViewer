@@ -12,11 +12,7 @@ using OpenTK.Windowing.Common;
 
 namespace Sm64DecompLevelViewer;
 
-/// <summary>
-/// Interaction logic for MainWindow.xaml
-/// </summary>
-public partial class MainWindow : Window
-{
+namespace Sm64DecompLevelViewer;
     private List<LevelMetadata> _levels = new();
     private readonly LevelScanner _levelScanner;
     private readonly CollisionParser _collisionParser;
@@ -57,7 +53,6 @@ public partial class MainWindow : Window
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        // No automatic loading - user must select a folder
         StatusText.Text = "Please select an SM64 Project Folder to start";
     }
 
@@ -78,7 +73,6 @@ public partial class MainWindow : Window
         {
             var selectedPath = dialog.FolderName;
             
-            // If the user selected 'levels' or 'howtomake', go up one level to the root
             var dirName = Path.GetFileName(selectedPath);
             if (dirName.Equals("levels", StringComparison.OrdinalIgnoreCase) || 
                 dirName.Equals("howtomake", StringComparison.OrdinalIgnoreCase))
@@ -102,7 +96,6 @@ public partial class MainWindow : Window
         {
             _levels = new List<LevelMetadata>();
 
-            // Scan user levels strictly from projectRootPath
             var levelsDir = Path.Combine(_projectRootPath, "levels");
             if (!Directory.Exists(levelsDir)) levelsDir = Path.Combine(_projectRootPath, "howtomake", "levels");
 
@@ -122,7 +115,6 @@ public partial class MainWindow : Window
                 return;
             }
 
-            // Group levels by category
             var groupedLevels = CollectionViewSource.GetDefaultView(_levels);
             groupedLevels.GroupDescriptions.Add(new PropertyGroupDescription("Category"));
             
@@ -181,7 +173,6 @@ public partial class MainWindow : Window
         
         LevelPathText.Text = level.LevelPath;
 
-        // Load collision files for this level
         LoadCollisionFiles(level);
 
         StatusText.Text = $"Selected: {level.FullName}";
@@ -233,7 +224,6 @@ public partial class MainWindow : Window
         if (!_collisionFiles.ContainsKey(areaName) || _selectedLevel == null)
             return;
 
-        // Load collision mesh
         var collisionFilePath = _collisionFiles[areaName];
         _currentCollisionMesh = _collisionParser.ParseCollisionFile(
             collisionFilePath, 
@@ -241,12 +231,10 @@ public partial class MainWindow : Window
             _selectedLevel.FullName
         );
 
-        // Load visual mesh if available
         if (_modelFiles.ContainsKey(areaName))
         {
             var modelFilePaths = _modelFiles[areaName];
             
-            // Parse geometry layout for transformations
             Dictionary<string, OpenTK.Mathematics.Matrix4>? transforms = null;
             // The geo.inc.c is usually in the area directory (e.g., levels/bob/areas/1/geo.inc.c)
             var areaPath = Path.GetDirectoryName(modelFilePaths[0]);
@@ -265,23 +253,19 @@ public partial class MainWindow : Window
                 }
             }
 
-                // --- NEW: Handle modular level pieces (Special Objects) ---
                 if (transforms == null) transforms = new Dictionary<string, OpenTK.Mathematics.Matrix4>();
 
                 var levelRoot = Path.GetDirectoryName(Path.GetDirectoryName(modelFilePaths[0]));
                 if (levelRoot != null)
                 {
-                    // 1. Get preset mapping
                     var specialParser = new SpecialObjectParser();
                     var includePath = Path.Combine(_selectedLevel.LevelPath, "..", "..", "include", "special_presets.inc.c");
                     var presetMapping = specialParser.ParsePresets(includePath);
 
-                    // 2. Get model->geo mapping from script.c
                     var objectParser = new ObjectParser();
                     var scriptPath = Path.Combine(_selectedLevel.LevelPath, "script.c");
                     var modelToGeo = objectParser.ParseLoadModels(scriptPath);
 
-                    // 3. Parse collision file for SPECIAL_OBJECTs
                     string colContent = File.ReadAllText(collisionFilePath);
                     var geoParser = new GeoLayoutParser();
 
@@ -295,8 +279,6 @@ public partial class MainWindow : Window
                             if (modelToGeo.TryGetValue(modelId, out string? geoLayoutName))
                             {
                                 // Find geo.inc.c for this model
-                                // Usually in levels/<level>/areas/<area>/<model_num>/geo.inc.c
-                                // We can try to find it by scanning subdirectories
                                 string? subGeoPath = FindGeoLayoutForModel(levelRoot, geoLayoutName);
                                 if (subGeoPath != null)
                                 {
@@ -358,7 +340,6 @@ public partial class MainWindow : Window
 
         try
         {
-            // Create OpenTK window settings
             var nativeWindowSettings = new NativeWindowSettings()
             {
                 Size = new Vector2i(1024, 768),
@@ -375,7 +356,6 @@ public partial class MainWindow : Window
             _renderer = new GeometryRenderer(gameWindowSettings, nativeWindowSettings);
             _renderer.LoadMesh(_currentCollisionMesh);
             
-            // Subscribe to object selection event
             _renderer.ObjectSelected += OnObjectSelected;
             
             if (_currentVisualMesh != null)
@@ -383,7 +363,6 @@ public partial class MainWindow : Window
                 _renderer.LoadVisualMesh(_currentVisualMesh);
             }
 
-            // Load objects from script.c
             if (_selectedLevel != null)
             {
                 var scriptPath = Path.Combine(_selectedLevel.LevelPath, "script.c");
@@ -392,15 +371,11 @@ public partial class MainWindow : Window
                     var objectParser = new ObjectParser();
                     var objects = objectParser.ParseScriptFile(scriptPath);
 
-                    // --- NEW: Load Macro Objects ---
                     try
                     {
                         var macroListName = objectParser.ParseMacroListName(scriptPath);
                         if (macroListName != null)
                         {
-                            Dictionary<string, MacroPreset> presets = new();
-                            
-                            // Load presets strictly from projectRootPath
                             if (!string.IsNullOrEmpty(_projectRootPath))
                             {
                                 var selectedPresetsPath = Path.Combine(_projectRootPath, "include", "macro_presets.inc.c");
@@ -412,13 +387,11 @@ public partial class MainWindow : Window
                                 }
                             }
 
-                            // Find the macro.inc.c file. It's usually in the area directory.
                             var levelPath = _selectedLevel.LevelPath;
                             var macroFiles = Directory.GetFiles(levelPath, "macro.inc.c", SearchOption.AllDirectories);
                             
                             foreach (var macroFile in macroFiles)
                             {
-                                // Check if this file contains the macro list name
                                 if (File.ReadAllText(macroFile).Contains(macroListName))
                                 {
                                     var macroObjects = _macroParser.ParseMacroFile(macroFile, presets);
@@ -435,7 +408,6 @@ public partial class MainWindow : Window
                     }
                     // -------------------------------
 
-                    // --- NEW: Load Special Objects from Collision ---
                     try
                     {
                         var areaName = AreaComboBox.SelectedItem as string;
@@ -444,7 +416,6 @@ public partial class MainWindow : Window
                             var specialParser = new SpecialObjectParser();
                             Dictionary<string, string> presetMapping = new();
 
-                            // Load presets strictly from projectRootPath
                             if (!string.IsNullOrEmpty(_projectRootPath))
                             {
                                 var selectedIncludePath = Path.Combine(_projectRootPath, "include", "special_presets.inc.c");
@@ -541,7 +512,6 @@ public partial class MainWindow : Window
 
     private void OnObjectSelected(LevelObject? selectedObject)
     {
-        // Update UI on the main thread
         Dispatcher.Invoke(() =>
         {
             if (selectedObject != null)
@@ -559,7 +529,6 @@ public partial class MainWindow : Window
     {
         try
         {
-            // Search subdirectories for geo.inc.c files and check if they contain the geoLayoutName
             var geoFiles = Directory.GetFiles(areaPath, "geo.inc.c", SearchOption.AllDirectories);
             foreach (var file in geoFiles)
             {

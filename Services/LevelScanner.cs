@@ -3,9 +3,6 @@ using Sm64DecompLevelViewer.Models;
 
 namespace Sm64DecompLevelViewer.Services;
 
-/// <summary>
-/// Service for discovering and categorizing SM64 decomp levels.
-/// </summary>
 public class LevelScanner
 {
     private readonly YamlLevelParser _yamlParser;
@@ -42,11 +39,6 @@ public class LevelScanner
         _yamlParser = new YamlLevelParser();
     }
 
-    /// <summary>
-    /// Scans the howtomake/levels directory and returns all discovered levels.
-    /// </summary>
-    /// <param name="howtomakePath">Path to the howtomake directory</param>
-    /// <returns>List of level metadata objects</returns>
     public List<LevelMetadata> ScanLevels(string howtomakePath)
     {
         var levels = new List<LevelMetadata>();
@@ -58,7 +50,6 @@ public class LevelScanner
             return levels;
         }
 
-        // Find all level.yaml files
         var yamlFiles = Directory.GetFiles(levelsPath, "level.yaml", SearchOption.AllDirectories);
 
         foreach (var yamlFile in yamlFiles)

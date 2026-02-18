@@ -10,9 +10,6 @@ using System.Linq;
 
 namespace Sm64DecompLevelViewer.Rendering;
 
-/// <summary>
-/// OpenTK-based renderer for collision and visual meshes.
-/// </summary>
 public class GeometryRenderer : GameWindow
 {
     private CollisionMesh? _collisionMesh;
@@ -57,7 +54,6 @@ public class GeometryRenderer : GameWindow
     private bool _showObjects = true;
     private HashSet<int> _hiddenSubModels = new(); // Track which sub-models are hidden
 
-    // Event for object selection
     public event Action<LevelObject?>? ObjectSelected;
 
     public GeometryRenderer(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
@@ -94,11 +90,6 @@ public class GeometryRenderer : GameWindow
 
         GL.ClearColor(0.1f, 0.1f, 0.15f, 1.0f);
         GL.Enable(EnableCap.DepthTest);
-
-        // Create shaders
-        _collisionShaderProgram = CreateCollisionShader();
-        _visualShaderProgram = CreateVisualShader();
-        _objectShaderProgram = CreateObjectShader();
 
         UpdateProjection();
         
@@ -536,7 +527,6 @@ public class GeometryRenderer : GameWindow
 
         UpdateCamera();
 
-        // Calculate MVP matrix
         Matrix4 mvp = _view * _projection;
 
         // Render visual mesh (solid)
@@ -607,7 +597,6 @@ public class GeometryRenderer : GameWindow
         {
             Console.WriteLine($"Left click detected, checking {_objects.Count} objects");
             
-            // Perform ray casting to find clicked object
             var mouseState = MouseState;
             Vector2 mousePos = new Vector2(mouseState.X, mouseState.Y);
             Console.WriteLine($"Mouse position: {mousePos}");
@@ -621,11 +610,9 @@ public class GeometryRenderer : GameWindow
                 _selectedObject = _objects[clickedObjectIndex];
                 Console.WriteLine($"Selected object: {_selectedObject.ModelName} at ({_selectedObject.X}, {_selectedObject.Y}, {_selectedObject.Z})");
                 
-                // Notify listeners
                 ObjectSelected?.Invoke(_selectedObject);
                 
-                // Trigger re-render to show selection
-                UploadObjectData(); // Re-upload with new selection
+                UploadObjectData();
             }
             else
             {
@@ -633,10 +620,9 @@ public class GeometryRenderer : GameWindow
                 _selectedObject = null;
                 Console.WriteLine("No object selected");
                 
-                // Notify listeners
                 ObjectSelected?.Invoke(null);
                 
-                UploadObjectData(); // Re-upload to clear selection
+                UploadObjectData();
             }
         }
         else if (e.Button == MouseButton.Left)
@@ -651,25 +637,20 @@ public class GeometryRenderer : GameWindow
         float x = (2.0f * screenPos.X) / Size.X - 1.0f;
         float y = 1.0f - (2.0f * screenPos.Y) / Size.Y;
 
-        // Use a robust near-to-far unprojection method
-        // Points in NDC space (-1 to 1)
         Vector4 nearPointNDC = new Vector4(x, y, -1.0f, 1.0f);
         Vector4 farPointNDC = new Vector4(x, y, 1.0f, 1.0f);
 
         Matrix4 invViewProj = Matrix4.Invert(_view * _projection);
 
-        // Unproject points
         Vector4 nearPointWorld = nearPointNDC * invViewProj;
         Vector4 farPointWorld = farPointNDC * invViewProj;
 
-        // Perspective divide (W-divide)
         Vector3 nearPoint = nearPointWorld.Xyz / nearPointWorld.W;
         Vector3 farPoint = farPointWorld.Xyz / farPointWorld.W;
 
         Vector3 rayOrigin = nearPoint;
         Vector3 rayDir = Vector3.Normalize(farPoint - nearPoint);
 
-        // Test intersection with each object's bounding box
         float closestDistance = float.MaxValue;
         int closestObjectIndex = -1;
         float cubeSize = HITBOX_OBJECT_SIZE; // Controlled for selection accuracy
@@ -680,7 +661,6 @@ public class GeometryRenderer : GameWindow
             Vector3 objCenter = new Vector3(obj.X, obj.Y, obj.Z);
             float halfSize = cubeSize / 2;
 
-            // Simple ray-box intersection test
             if (RayIntersectsBox(rayOrigin, rayDir, objCenter, halfSize, out float distance))
             {
                 if (distance < closestDistance)

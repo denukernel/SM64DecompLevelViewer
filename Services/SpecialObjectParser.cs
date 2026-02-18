@@ -7,7 +7,6 @@ namespace Sm64DecompLevelViewer.Services
 {
     public class SpecialObjectParser
     {
-        // Regex to parse { preset_name, SPTYPE_..., 0x... or decimal, MODEL_NAME, ... }
         private static readonly Regex PresetPattern = new Regex(
             @"\{\s*([a-zA-Z0-9_]+),\s*SPTYPE_[a-zA-Z0-9_]+,\s*(?:0x[a-fA-F0-9]+|\d+),\s*([a-zA-Z0-9_]+)",
             RegexOptions.Compiled);

@@ -4,10 +4,6 @@ using Sm64DecompLevelViewer.Models;
 
 namespace Sm64DecompLevelViewer.Services;
 
-/// <summary>
-/// Parser for SM64 decomp collision.inc.c files.
-/// Extracts vertices and triangles from C macro definitions.
-/// </summary>
 public class CollisionParser
 {
     // Regex patterns for parsing collision macros
@@ -15,13 +11,6 @@ public class CollisionParser
     private static readonly Regex TriPattern = new(@"COL_TRI\((\d+),\s*(\d+),\s*(\d+)\)", RegexOptions.Compiled);
     private static readonly Regex TriInitPattern = new(@"COL_TRI_INIT\(([A-Z_]+),\s*(\d+)\)", RegexOptions.Compiled);
 
-    /// <summary>
-    /// Parses a collision.inc.c file and returns the collision mesh.
-    /// </summary>
-    /// <param name="collisionFilePath">Path to the collision.inc.c file</param>
-    /// <param name="areaName">Name of the area (e.g., "Area 1")</param>
-    /// <param name="levelName">Name of the level</param>
-    /// <returns>CollisionMesh object or null if parsing fails</returns>
     public CollisionMesh? ParseCollisionFile(string collisionFilePath, string areaName, string levelName)
     {
         try
@@ -39,10 +28,8 @@ public class CollisionParser
                 LevelName = levelName
             };
 
-            // Parse vertices
             ParseVertices(fileContent, mesh);
 
-            // Parse triangles
             ParseTriangles(fileContent, mesh);
 
             Console.WriteLine($"Parsed collision: {mesh}");
@@ -73,12 +60,9 @@ public class CollisionParser
 
     private void ParseTriangles(string content, CollisionMesh mesh)
     {
-        // Find all COL_TRI_INIT to track surface types
         var triInitMatches = TriInitPattern.Matches(content);
         var currentSurfaceType = "SURFACE_DEFAULT";
 
-        // Parse triangles
-        var triMatches = TriPattern.Matches(content);
         int triInitIndex = 0;
         int triCount = 0;
         int expectedTriCount = 0;
@@ -113,11 +97,6 @@ public class CollisionParser
         }
     }
 
-    /// <summary>
-    /// Finds all collision.inc.c files in a level directory.
-    /// </summary>
-    /// <param name="levelPath">Path to the level directory</param>
-    /// <returns>Dictionary of area names to collision file paths</returns>
     public Dictionary<string, string> FindCollisionFiles(string levelPath)
     {
         var collisionFiles = new Dictionary<string, string>();
@@ -130,7 +109,6 @@ public class CollisionParser
                 return collisionFiles;
             }
 
-            // Find all collision.inc.c files in area subdirectories
             var areaDirectories = Directory.GetDirectories(areasPath);
             foreach (var areaDir in areaDirectories)
             {

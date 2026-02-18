@@ -2,9 +2,6 @@ using YamlDotNet.Serialization;
 
 namespace Sm64DecompLevelViewer.Models;
 
-/// <summary>
-/// Represents the metadata from a level.yaml file in the SM64 decomp project.
-/// </summary>
 public class LevelMetadata
 {
     [YamlMember(Alias = "short-name")]
@@ -40,15 +37,9 @@ public class LevelMetadata
     [YamlMember(Alias = "common-bin")]
     public List<string> CommonBin { get; set; } = new();
 
-    /// <summary>
-    /// Full path to the level directory
-    /// </summary>
     [YamlIgnore]
     public string LevelPath { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Category of the level (Course, Bowser, Castle, Special, Menu)
-    /// </summary>
     [YamlIgnore]
     public string Category { get; set; } = "Unknown";
 

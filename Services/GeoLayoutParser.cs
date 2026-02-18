@@ -5,10 +5,6 @@ using Sm64DecompLevelViewer.Models;
 
 namespace Sm64DecompLevelViewer.Services;
 
-/// <summary>
-/// Parses SM64 geometry layout files (geo.inc.c) to extract transformation data.
-/// Phase 4B: Full transformation support with rotation, scale, and hierarchical scene graphs.
-/// </summary>
 public class GeoLayoutParser
 {
     // Regex patterns for GEO commands
@@ -59,7 +55,6 @@ public class GeoLayoutParser
         var content = File.ReadAllText(filePath);
         var root = new GeoNode(GeoNodeType.Root);
 
-        // Parse all transformation commands
         ParseAllCommands(content, root);
 
         return root;
@@ -67,7 +62,6 @@ public class GeoLayoutParser
 
     private void ParseAllCommands(string content, GeoNode root)
     {
-        // Parse GEO_TRANSLATE commands
         foreach (Match match in TranslatePattern.Matches(content))
         {
             var node = new GeoNode(GeoNodeType.Translate);
@@ -80,7 +74,6 @@ public class GeoLayoutParser
             Console.WriteLine($"Found GEO_TRANSLATE: {node.Translation}");
         }
 
-        // Parse GEO_TRANSLATE_WITH_DL commands
         foreach (Match match in TranslateWithDlPattern.Matches(content))
         {
             var node = new GeoNode(GeoNodeType.Translate);
@@ -94,7 +87,6 @@ public class GeoLayoutParser
             Console.WriteLine($"Found GEO_TRANSLATE_WITH_DL: {node.Translation}, DL: {node.DisplayListName}");
         }
 
-        // Parse GEO_ROTATE commands
         foreach (Match match in RotatePattern.Matches(content))
         {
             var node = new GeoNode(GeoNodeType.Rotate);
@@ -107,7 +99,6 @@ public class GeoLayoutParser
             Console.WriteLine($"Found GEO_ROTATE: {node.Rotation} degrees");
         }
 
-        // Parse GEO_ROTATE_WITH_DL commands
         foreach (Match match in RotateWithDlPattern.Matches(content))
         {
             var node = new GeoNode(GeoNodeType.Rotate);
@@ -121,7 +112,6 @@ public class GeoLayoutParser
             Console.WriteLine($"Found GEO_ROTATE_WITH_DL: {node.Rotation} degrees, DL: {node.DisplayListName}");
         }
 
-        // Parse GEO_SCALE commands
         foreach (Match match in ScalePattern.Matches(content))
         {
             var node = new GeoNode(GeoNodeType.Scale);
@@ -130,7 +120,6 @@ public class GeoLayoutParser
             Console.WriteLine($"Found GEO_SCALE: {node.Scale}");
         }
 
-        // Parse GEO_SCALE_WITH_DL commands
         foreach (Match match in ScaleWithDlPattern.Matches(content))
         {
             var node = new GeoNode(GeoNodeType.Scale);
@@ -140,7 +129,6 @@ public class GeoLayoutParser
             Console.WriteLine($"Found GEO_SCALE_WITH_DL: {node.Scale}, DL: {node.DisplayListName}");
         }
 
-        // Parse GEO_TRANSLATE_ROTATE commands
         foreach (Match match in TranslateRotatePattern.Matches(content))
         {
             var node = new GeoNode(GeoNodeType.TranslateRotate);
@@ -158,7 +146,6 @@ public class GeoLayoutParser
             Console.WriteLine($"Found GEO_TRANSLATE_ROTATE: T:{node.Translation}, R:{node.Rotation} degrees");
         }
 
-        // Parse GEO_TRANSLATE_ROTATE_WITH_DL commands
         foreach (Match match in TranslateRotateWithDlPattern.Matches(content))
         {
             var node = new GeoNode(GeoNodeType.TranslateRotate);
@@ -177,7 +164,6 @@ public class GeoLayoutParser
             Console.WriteLine($"Found GEO_TRANSLATE_ROTATE_WITH_DL: T:{node.Translation}, R:{node.Rotation} degrees, DL: {node.DisplayListName}");
         }
 
-        // Parse GEO_DISPLAY_LIST commands (for reference)
         foreach (Match match in DisplayListPattern.Matches(content))
         {
             var node = new GeoNode(GeoNodeType.DisplayList);
@@ -187,10 +173,6 @@ public class GeoLayoutParser
         }
     }
 
-    /// <summary>
-    /// Helper to find the first display list name in a geo layout file.
-    /// Useful for simple modular pieces that don't have complex hierarchies.
-    /// </summary>
     public string? GetPrimaryDisplayListName(string filePath)
     {
         if (!File.Exists(filePath)) return null;
@@ -216,10 +198,6 @@ public class GeoLayoutParser
         return null;
     }
 
-    /// <summary>
-    /// Converts SM64 angle units to degrees.
-    /// SM64 uses: 0x10000 = 360 degrees
-    /// </summary>
     private float ConvertAngleToDegrees(string angleStr)
     {
         long angleUnits;
@@ -232,10 +210,6 @@ public class GeoLayoutParser
         return (float)((angleUnits / 65536.0) * 360.0);
     }
 
-    /// <summary>
-    /// Converts SM64 scale value to float.
-    /// SM64 uses: 0x10000 = 1.0 (65536 = 1.0)
-    /// </summary>
     private float ConvertScale(string scaleStr)
     {
         long scaleUnits;
@@ -248,10 +222,6 @@ public class GeoLayoutParser
         return (float)(scaleUnits / 65536.0);
     }
 
-    /// <summary>
-    /// Extracts world-space transformations from the scene graph.
-    /// For Phase 4B, we build proper transformation matrices.
-    /// </summary>
     public Dictionary<string, Matrix4> ExtractTransformations(GeoNode root)
     {
         var transforms = new Dictionary<string, Matrix4>();
@@ -269,10 +239,6 @@ public class GeoLayoutParser
         return transforms;
     }
 
-    /// <summary>
-    /// Builds a transformation matrix from a GeoNode.
-    /// Order: Scale * Rotation * Translation (TRS)
-    /// </summary>
     private Matrix4 BuildTransformMatrix(GeoNode node)
     {
         var translation = Matrix4.CreateTranslation(node.Translation);

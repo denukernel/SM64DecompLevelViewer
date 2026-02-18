@@ -5,9 +5,6 @@ using Sm64DecompLevelViewer.Models;
 
 namespace Sm64DecompLevelViewer.Services;
 
-/// <summary>
-/// Service for parsing level.yaml files from the SM64 decomp project.
-/// </summary>
 public class YamlLevelParser
 {
     private readonly IDeserializer _deserializer;
@@ -20,11 +17,6 @@ public class YamlLevelParser
             .Build();
     }
 
-    /// <summary>
-    /// Parses a level.yaml file and returns the level metadata.
-    /// </summary>
-    /// <param name="yamlFilePath">Full path to the level.yaml file</param>
-    /// <returns>LevelMetadata object or null if parsing fails</returns>
     public LevelMetadata? ParseLevelYaml(string yamlFilePath)
     {
         try
@@ -40,7 +32,6 @@ public class YamlLevelParser
 
             if (levelMetadata != null)
             {
-                // Set the level path (parent directory of the yaml file)
                 levelMetadata.LevelPath = Path.GetDirectoryName(yamlFilePath) ?? string.Empty;
             }
 

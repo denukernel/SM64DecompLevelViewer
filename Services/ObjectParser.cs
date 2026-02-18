@@ -4,24 +4,18 @@ using Sm64DecompLevelViewer.Models;
 
 namespace Sm64DecompLevelViewer.Services;
 
-/// <summary>
-/// Parses object definitions from SM64 level script.c files.
-/// </summary>
 public class ObjectParser
 {
-    // Regex to match OBJECT(...) and OBJECT_WITH_ACTS(...) macros
     private static readonly Regex ObjectPattern = new Regex(
         @"OBJECT(?:_WITH_ACTS)?\s*\(\s*(?:/\*[^/]+\*/\s*)?([^,]+),\s*(?:/\*[^/]+\*/\s*)?(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(?:/\*[^/]+\*/\s*)?(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(?:/\*[^/]+\*/\s*)?([^,]+),\s*(?:/\*[^/]+\*/\s*)?([^,)]+)(?:,\s*([^)]+))?\)",
         RegexOptions.Compiled | RegexOptions.Multiline
     );
 
-    // Regex to match MARIO_POS(area, yaw, posX, posY, posZ)
     private static readonly Regex MarioPosPattern = new Regex(
         @"MARIO_POS\s*\(\s*([^,]+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+)\s*\)",
         RegexOptions.Compiled
     );
 
-    // Regex to match LOAD_MODEL_FROM_GEO macros
     private static readonly Regex LoadModelPattern = new Regex(
         @"LOAD_MODEL_FROM_GEO\s*\(\s*([^,]+),\s*([^)]+)\)",
         RegexOptions.Compiled
@@ -60,7 +54,6 @@ public class ObjectParser
                         Behavior = match.Groups[9].Value.Trim()
                     };
 
-                    // Parse params
                     string paramsStr = match.Groups[8].Value.Trim();
                     if (paramsStr.StartsWith("0x"))
                     {
@@ -83,7 +76,6 @@ public class ObjectParser
                 }
             }
 
-            // Parse Mario position
             var marioMatches = MarioPosPattern.Matches(content);
             foreach (Match match in marioMatches)
             {
@@ -106,7 +98,6 @@ public class ObjectParser
         return objects;
     }
 
-    // Regex to match MACRO_OBJECTS(/*objList*/ list_name) macros
     private static readonly Regex MacroObjectsPattern = new Regex(
         @"MACRO_OBJECTS\s*\(\s*/\*objList\*/\s*([^)]+)\)",
         RegexOptions.Compiled
