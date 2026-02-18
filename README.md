@@ -1,8 +1,8 @@
 # SM64 Decomp Level Viewer
 
-A powerful and modern C#/.NET 8 levels viewer for Super Mario 64 Decompilation projects. This tool allows you to visualize levels, collision data, and object placement (including macro and special objects) directly from your decomp repository.
+A powerful and modern C#/.NET 8 level viewer for Super Mario 64 Decompilation projects. This tool allows you to see levels, collision data, and object placement (including macro and special objects) directly from your decomp repo.
 
-![Feature Preview](https://via.placeholder.com/800x450.png?text=SM64+Decomp+Level+Viewer+Preview)
+![Feature Preview](https://github.com/user-attachments/assets/b6de54b7-9f83-4f9e-a948-274193dbdd51)
 
 ## Key Features
 
@@ -13,7 +13,6 @@ A powerful and modern C#/.NET 8 levels viewer for Super Mario 64 Decompilation p
     - **Macro Objects**: Automatic parsing of `macro.inc.c` and preset resolution.
     - **Special Objects**: Extraction of trees, signs, and other modular pieces directly from collision data.
 - **Dynamic Project Selection**: 100% portable. Select any SM64 decomp root folder and the viewer handles the rest.
-- **Advanced Parsing**: Intelligent regex-based parsers that handle C-style comments, variable whitespace, and complex macro formats (`OBJECT_WITH_ACTS`, `MARIO_POS`, etc.).
 - **Modern UI**: Clean WPF-based interface with glassmorphism aesthetics and dark mode support.
 
 ## Getting Started
@@ -27,7 +26,7 @@ A powerful and modern C#/.NET 8 levels viewer for Super Mario 64 Decompilation p
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/User/Sm64DecompLevelViewer.git
+   git clone https://github.com/denukernel/Sm64DecompLevelViewer.git
    ```
 2. Build and run the project using Visual Studio or the .NET CLI:
    ```bash
@@ -40,10 +39,9 @@ A powerful and modern C#/.NET 8 levels viewer for Super Mario 64 Decompilation p
 ## Controls (3D Viewer)
 
 - **WASD**: Move camera
-- **QE**: Ascend/Descend
 - **Mouse**: Rotate camera
 - **Left Click**: Select objects for detailed information
-
+- More on the 3d viewer.
 ## Technical Stack
 
 - **C# / .NET 8**
